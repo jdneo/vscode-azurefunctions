@@ -7,6 +7,7 @@
 import WebSiteManagementClient = require('azure-arm-website');
 import { SiteConfigResource, StringDictionary, User } from 'azure-arm-website/lib/models';
 import { DeviceTokenCredentials } from 'ms-rest-azure';
+import * as opn from "opn";
 import * as portfinder from 'portfinder';
 import * as vscode from 'vscode';
 import { SiteWrapper } from 'vscode-azureappservice';
@@ -18,9 +19,12 @@ import { FunctionAppTreeItem } from '../tree/FunctionAppTreeItem';
 import { nodeUtils } from '../utils/nodeUtils';
 
 export async function remoteDebugFunctionApp(outputChannel: vscode.OutputChannel, tree: AzureTreeDataProvider, node?: IAzureNode<FunctionAppTreeItem>): Promise<void> {
-    const confirmMsg: string = localize('azFunc.confirmRemoteDebug', 'This is an experimental feature and only support Java Function now. Would you like to continue?');
-    const result: vscode.MessageItem | undefined = await vscode.window.showWarningMessage(confirmMsg, DialogResponses.yes, DialogResponses.cancel);
+    const confirmMsg: string = localize('azFunc.confirmRemoteDebug', 'The configurations of the selected app will be changed before debugging. Would you like to continue?');
+    const result: vscode.MessageItem | undefined = await vscode.window.showWarningMessage(confirmMsg, DialogResponses.yes, DialogResponses.seeMoreInfo, DialogResponses.cancel);
     if (result === DialogResponses.cancel) {
+        return;
+    } else if (result === DialogResponses.seeMoreInfo) {
+        opn('https://aka.ms/azfunc-remotedebug');
         return;
     }
 
