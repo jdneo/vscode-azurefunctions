@@ -48,13 +48,13 @@ to get started with the Azure Functions extension.
 
 ### Debug Function App on Azure (experimental)
 ![Remote Debug](resources/RemoteDebug.gif)
-> Note: This is an experimental feature and only support `Java` Azure Function currently.
+> Note: This is an experimental feature and currently only support Java Function Apps.
 
-To enable the remote debug, the extension will change the configuration of the target Function App:
-- The `use32BitWorkerProcess` attribute will be set to false
-- The `webSocketsEnabled` attribute will be set to true
+To enable remote debugging, the following configurations of the selected function app will be changed:
+- `use32BitWorkerProcess` will be set to false
+- `webSocketsEnabled` will be set to true
 
-The following key-value pairs will be added into the Application Settings:
+The following key-value pairs will be added to the Application Settings:
 - JAVA_OPTS: `-Djava.net.preferIPv4Stack=true -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=127.0.0.1:8898`
 - HTTP_PLATFORM_DEBUG_PORT: `8898`
 
