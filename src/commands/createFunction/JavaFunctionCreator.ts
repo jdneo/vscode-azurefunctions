@@ -10,7 +10,6 @@ import { IAzureUserInput } from 'vscode-azureextensionui';
 import { localize } from "../../localize";
 import { Template } from "../../templates/Template";
 import { removeLanguageFromId } from "../../templates/TemplateData";
-import { cpUtils } from "../../utils/cpUtils";
 import * as fsUtil from '../../utils/fs';
 import { getFullClassName, parseJavaClassName, validatePackageName } from "../../utils/javaNameUtils";
 import { mavenUtils } from "../../utils/mavenUtils";
@@ -59,10 +58,9 @@ export class JavaFunctionCreator extends FunctionCreatorBase {
 
         await mavenUtils.validateMavenInstalled(this._functionAppPath);
         this._outputChannel.show();
-        await cpUtils.executeCommand(
+        await mavenUtils.executeMvnCommand(
             this._outputChannel,
             this._functionAppPath,
-            'mvn',
             'azure-functions:add',
             '-B',
             `"-Dfunctions.package=${this._packageName}"`,
