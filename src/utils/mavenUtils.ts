@@ -4,6 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as fse from 'fs-extra';
+import * as os from 'os';
+import * as vscode from 'vscode';
 import * as xml2js from 'xml2js';
 import { localize } from '../localize';
 import { cpUtils } from './cpUtils';
@@ -34,5 +36,29 @@ export namespace mavenUtils {
                 resolve(undefined);
             });
         });
+    }
+
+    export async function executeMvnCommand(outputChannel: vscode.OutputChannel | undefined, workingDirectory: string | undefined, ...args: string[]): Promise<void> {
+        await cpUtils.executeCommandWithCallback(
+            (formattedArgs: string, code: number, outputs: string, resolve: () => void, reject: (e: Error) => void) => {
+                if (code !== 0) {
+                    const mvnErrorRegexp: RegExp = new RegExp(/^\[ERROR\](.*)$/, 'gm');
+                    const linesWithErrors: RegExpMatchArray | null = outputs.match(mvnErrorRegexp);
+                    let errorOutput: string = '';
+                    if (linesWithErrors !== null) {
+                        for (const line of linesWithErrors) {
+                            errorOutput += `${line.trim() ? line.trim() : ''}\n`;
+                        }
+                    }
+                    errorOutput = errorOutput.replace(/^\[ERROR\]/gm, '');
+                    reject(new Error(localize('azFunc.mavenCommandError', 'Error occurs when executing "mvn".{0}{1}', os.EOL, errorOutput)));
+                } else {
+                    if (outputChannel) {
+                        outputChannel.appendLine(localize('finishedRunningCommand', 'Finished running command: "{0} {1}".', mvnCommand, formattedArgs));
+                    }
+                    resolve();
+                }
+            },
+            outputChannel, workingDirectory, mvnCommand, ...args);
     }
 }
